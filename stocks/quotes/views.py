@@ -1,15 +1,15 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import Stock
-from .forms import StockForm , SignUpForm
+from .forms import StockForm , SignUpForm , EditProfileForm 
 from django.contrib import messages
 from django.views.generic import TemplateView
 import matplotlib.pyplot as plt
 import requests
 import io
 import urllib, base64
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 
 def login_user(request):
     if request.method == "POST":
@@ -25,10 +25,38 @@ def login_user(request):
             return redirect('login')
     else:
         return render(request, 'login.html')
+
+
 def logout_user(request):
     logout(request)
     messages.success(request,('You Haver Been Logged Out...'))
     return redirect('home')
+
+
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordChangeForm(data=request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            update_session_auth_hash(request,form.user)
+            messages.success(request,('You Have Edited Your Password...'))
+            return redirect('home')
+    else:
+        form = PasswordChangeForm(user = request.user)
+    context = {'form': form}
+    return render(request, 'change_password.html',context)
+
+def edit_profile(request):
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request,('You Have Edited Your Profile...'))
+            return redirect('home')
+    else:
+        form = EditProfileForm(instance = request.user)
+    context = {'form': form}
+    return render(request, 'edit_profile.html',context)
 
 def register_user(request):
     if request.method == 'POST':
@@ -43,8 +71,9 @@ def register_user(request):
             return redirect('home')
     else:
         form = SignUpForm()
+
     context = {'form': form}
-    return render(request, ('register.html'),context)
+    return render(request, 'register.html',context)
 
 def home(request):
     import requests

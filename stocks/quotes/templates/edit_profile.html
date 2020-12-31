@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1 class="text-center">Register Page</h1>
-<div class="col-md-6 offset-md-3">
-    <form method="POST" action ="{% url 'register' %}">
+<h1 class="text-center">Edit Profile</h1>
+    <form method="POST" action ="{% url 'edit_profile' %}">
         {% csrf_token %}
 
         {% if form.errors %}
@@ -20,9 +19,11 @@
         </div><br />
         {% endif %}
     {{ form.as_p}}
-    <button type="submit" value="Register" class="btn btn-secondary">register</button>
+    
+    <button type="submit" value="Edit" class="btn btn-secondary">Edit Your Profile</button>
+    <br/><br/>
+    <p><small><a href="{% url 'change_password' %}">Click To Change Password </a></small></p>
     </form>
-</div>
 
 
 {% endblock %}
