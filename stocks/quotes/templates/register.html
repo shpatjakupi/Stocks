@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1 class="text-center">Register Page</h1>
+<div class="col-md-6 offset-md-3">
+    <form method="POST" action ="{% url 'register' %}">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <p>Form error</p>
+        {% endif %}
+    {{ form.as_p}}
+    <button type="submit" value="Register" class="btn btn-secondary">register</button>
+    </form>
+</div>
+
+
+{% endblock %}
