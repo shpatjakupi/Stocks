@@ -99,6 +99,7 @@ def login_user(request):
         return render(request, 'login.html')
 
 
+
 def logout_user(request):
     logout(request)
     messages.success(request,('You Haver Been Logged Out...'))
