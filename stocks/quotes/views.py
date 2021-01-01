@@ -11,6 +11,78 @@ import urllib, base64
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm, PasswordChangeForm
 
+def home(request):
+    import requests
+    import json
+    import numpy as np
+
+    if request.method == "POST":
+        ticker = request.POST["ticker"]
+        api_request = requests.get(
+            "https://sandbox.iexapis.com/stable/stock/"
+            + ticker
+            + "/quote?token=Tpk_1ffd0fa5cbb241889288941e2f4e0e0f"
+        )
+        try:
+            api = json.loads(api_request.content)
+            plt.switch_backend('agg')
+            plt.plot([15, 16, 17, 22],[api.get('open') ,api.get('low') , api.get('high'),api.get('close') ])
+            plt.ylabel('P R I C E I N $')
+            plt.xlabel('TIME')
+            fig = plt.gcf()
+            buf = io.BytesIO()
+            fig.savefig(buf, format="png")
+            buf.seek(0)
+            string = base64.b64encode(buf.read())
+            uri = urllib.parse.quote(string)
+        except Exception as e:
+            api = "Error..."
+        return render(request, "home.html", {"data": uri})
+    else:
+        return render(request, "home.html", {"ticker": "Enter a ticker symbol above"})
+
+
+def add_stock(request):
+    import requests
+    import json
+
+    if request.method == "POST":
+        form = StockForm(request.POST or None)
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, ("Stock Has Been Added..."))
+            return redirect("add_stock")
+    else:
+        ticker = Stock.objects.all()
+        output = []
+        for ticker_item in ticker:
+            api_request = requests.get(
+                "https://sandbox.iexapis.com/stable/stock/"
+                + str(ticker_item)
+                + "/quote?token=Tpk_1ffd0fa5cbb241889288941e2f4e0e0f"
+            )
+            try:
+                api = json.loads(api_request.content)
+                output.append(api)
+            except Exception as e:
+                api = "Error..."
+
+        return render(request, "add_stock.html", {"ticker": ticker, "output": output})
+
+
+def delete(request, stock_id):
+    item = Stock.objects.get(pk=stock_id)
+    item.delete()
+    messages.success(request, ("Stock Has Been Deleted!"))
+    return redirect(delete_stock)
+
+
+def delete_stock(request):
+    ticker = Stock.objects.all()
+    return render(request, "delete_stock.html", {"ticker": ticker})
+
+
 def login_user(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -74,80 +146,3 @@ def register_user(request):
 
     context = {'form': form}
     return render(request, 'register.html',context)
-
-def home(request):
-    import requests
-    import json
-    import numpy as np
-
-    if request.method == "POST":
-        ticker = request.POST["ticker"]
-        api_request = requests.get(
-            "https://sandbox.iexapis.com/stable/stock/"
-            + ticker
-            + "/quote?token=Tpk_1ffd0fa5cbb241889288941e2f4e0e0f"
-        )
-        try:
-            api = json.loads(api_request.content)
-            plt.switch_backend('agg')
-            plt.plot([15, 16, 17, 22],[api.get('open') ,api.get('low') , api.get('high'),api.get('close') ])
-            plt.ylabel('P R I C E I N $')
-            plt.xlabel('TIME')
-            fig = plt.gcf()
-            buf = io.BytesIO()
-            fig.savefig(buf, format="png")
-            buf.seek(0)
-            string = base64.b64encode(buf.read())
-            uri = urllib.parse.quote(string)
-        except Exception as e:
-            api = "Error..."
-        return render(request, "home.html", {"data": uri})
-    else:
-        return render(request, "home.html", {"ticker": "Enter a ticker symbol above"})
-
-
-def about(request):
-    return render(request, "about.html", {})
-
-
-def add_stock(request):
-    import requests
-    import json
-
-    if request.method == "POST":
-        form = StockForm(request.POST or None)
-
-        if form.is_valid():
-            form.save()
-            messages.success(request, ("Stock Has Been Added..."))
-            return redirect("add_stock")
-    else:
-        ticker = Stock.objects.all()
-        output = []
-        for ticker_item in ticker:
-            api_request = requests.get(
-                "https://sandbox.iexapis.com/stable/stock/"
-                + str(ticker_item)
-                + "/quote?token=Tpk_1ffd0fa5cbb241889288941e2f4e0e0f"
-            )
-            try:
-                api = json.loads(api_request.content)
-                output.append(api)
-            except Exception as e:
-                api = "Error..."
-
-        return render(request, "add_stock.html", {"ticker": ticker, "output": output})
-
-
-def delete(request, stock_id):
-    item = Stock.objects.get(pk=stock_id)
-    item.delete()
-    messages.success(request, ("Stock Has Been Deleted!"))
-    return redirect(delete_stock)
-
-
-def delete_stock(request):
-    ticker = Stock.objects.all()
-    return render(request, "delete_stock.html", {"ticker": ticker})
-
-

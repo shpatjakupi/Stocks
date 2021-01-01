@@ -20,7 +20,7 @@ class SignUpForm(UserCreationForm):
         fields = ('username', 'first_name', 'last_name', 'email', 'password1', 'password2')
 
 class EditProfileForm(UserChangeForm):
-    password = forms.CharField(widget=forms.TextInput(attrs={'type':'hidden'}))
+    password = forms.CharField(widget=forms.TextInput(attrs={'type':'hidden '}))
     class Meta:
         model = User
         fields = ('username', 'first_name', 'last_name',  'email', 'password',)
