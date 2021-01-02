@@ -4,7 +4,6 @@ from .models import Stock
 from .forms import StockForm , SignUpForm , EditProfileForm 
 from django.contrib import messages
 from django.views.generic import TemplateView
-import requests
 import io
 import urllib, base64
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
@@ -72,6 +71,8 @@ def add_stock(request):
 
 
 def delete(request, stock_id):
+    import requests
+
     item = Stock.objects.get(pk=stock_id)
     item.delete()
     messages.success(request, ("Stock Has Been Deleted!"))
@@ -79,11 +80,15 @@ def delete(request, stock_id):
 
 
 def delete_stock(request):
+    import requests
+
     ticker = Stock.objects.all()
     return render(request, "delete_stock.html", {"ticker": ticker})
 
 
 def login_user(request):
+    import requests
+
     if request.method == "POST":
         username = request.POST['username']
         password = request.POST['password']
@@ -101,12 +106,16 @@ def login_user(request):
 
 
 def logout_user(request):
+    import requests
+
     logout(request)
     messages.success(request,('You Haver Been Logged Out...'))
     return redirect('home')
 
 
 def change_password(request):
+    import requests
+
     if request.method == 'POST':
         form = PasswordChangeForm(data=request.POST, user=request.user)
         if form.is_valid():
@@ -120,6 +129,8 @@ def change_password(request):
     return render(request, 'change_password.html',context)
 
 def edit_profile(request):
+    import requests
+
     if request.method == 'POST':
         form = EditProfileForm(request.POST, instance=request.user)
         if form.is_valid():
@@ -132,6 +143,8 @@ def edit_profile(request):
     return render(request, 'edit_profile.html',context)
 
 def register_user(request):
+    import requests
+    
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
