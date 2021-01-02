@@ -4,7 +4,6 @@ from .models import Stock
 from .forms import StockForm , SignUpForm , EditProfileForm 
 from django.contrib import messages
 from django.views.generic import TemplateView
-import matplotlib.pyplot as plt
 import requests
 import io
 import urllib, base64
@@ -15,6 +14,7 @@ def home(request):
     import requests
     import json
     import numpy as np
+    import matplotlib.pyplot as plt
 
     if request.method == "POST":
         ticker = request.POST["ticker"]
